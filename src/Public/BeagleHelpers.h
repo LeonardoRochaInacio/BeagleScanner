@@ -3,8 +3,9 @@
 #include <TlHelp32.h>
 #include <vector>
 #include <bitset>
+
 /* ARM - Access Right Memory */
-#define BEAGLE_ARM_ALL_ACCESS PROCESS_ALL_ACCESS
+#define BEAGLE_ARM_ALL_ACCESS PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION | PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION
 #define BEAGLE_ARM_READ_ONLY PROCESS_VM_READ
 #define BEAGLE_ARM_WRITE_ONLY PROCESS_VM_WRITE | PROCESS_VM_OPERATION
 #define BEAGLE_ARM_TERMINATE PROCESS_TERMINATE 
@@ -126,7 +127,7 @@ public:
 					{
 						int H = 1337;
 						WriteProcessMemory(p, (void*)((int)meminfo.BaseAddress + i), &H, sizeof(int), &S);
-						std::cout << std::hex << (unsigned int)meminfo.BaseAddress + i << std::dec << " VAL: " << val << std::endl;
+						//std::cout << std::hex << (unsigned int)meminfo.BaseAddress + i << std::dec << " VAL: " << val << std::endl;
 					}
 					
 				}

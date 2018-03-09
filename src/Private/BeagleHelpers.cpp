@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include "BeagleHelpers.h"
+#include "..\Public\BeagleHelpers.h"
 
 const char * BeagleHelpers::StringErrorConvert(int Error)
 {
@@ -82,7 +82,7 @@ HANDLE BeagleHelpers::CreateProcessHandle(DWORD ProcessID, BEAGLE_ARM Permission
 
 	HANDLE ProcessHandle = OpenProcess(Permission, false, ProcessID);
 	if (ProcessHandle == NULL) return nullptr;
-
+	
 	return ProcessHandle;
 }
 
