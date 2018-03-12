@@ -1,4 +1,3 @@
-#include <iostream>
 #include "..\Public\BeagleProcess.h"
 #include "..\Public\BeagleHelpers.h"
 
@@ -35,6 +34,8 @@ void BeagleProcess::Close()
 
 void BeagleProcess::SweepProcessPages()
 {
+	ClearSavedProcessPages();
+
 	unsigned char * Address = 0x0;
 	MEMORY_BASIC_INFORMATION MemoryInfo;
 
@@ -49,7 +50,6 @@ void BeagleProcess::SweepProcessPages()
 
 		if (!bFirstLoop)
 		{
-			std::cout << MemoryInfo.BaseAddress << std::endl;
 			CurrentPages.push_back(std::shared_ptr<BeagleMemoryPage>(new BeagleMemoryPage{ this, MemoryInfo }));
 		}
 

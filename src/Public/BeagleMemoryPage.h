@@ -13,11 +13,16 @@ for (int i = 0; i < (int)PageRegionSize; i += sizeof(TYPE)) \
 		(unsigned long)((int)PageAddress + i), \
 		&ReadedValue \
 	}; \
-	if (BeagleHelpers::ReadMemory(Data))\
-	{\
-		EXECUTION(ReadedValue);\
-	}\
+	bool Success = BeagleHelpers::ReadMemory(Data);\
+	if(Success) EXECUTION(Success, ReadedValue, (unsigned long)((int)PageAddress + i));\
 } 
+
+enum MemoryState
+{
+	Commit,
+	Free,
+	Reserve
+};
 
 class BeagleProcess;
 
@@ -32,21 +37,26 @@ public:
 
 	BeagleMemoryPage(BeagleProcess* Process, MEMORY_BASIC_INFORMATION _MemoryInformation);
 
+	BeagleProcess* GetProcessOwner();
+
+	int GetMemoryStateCode();
+
 	void HandleIsValidPtr();
 
 	template <typename T> 
 	void ReadPageRegionByType();
 
-public:
-
-	PVOID PageAddress;
-	SIZE_T PageRegionSize;
-	DWORD PageState;
-	DWORD PageProtect;
-
 private:
 
 	BeagleProcess* ProcessOwner;
+
+	PVOID PageAddress;
+
+	SIZE_T PageRegionSize;
+
+	DWORD PageState;
+
+	DWORD PageProtect;
 
 };
 
