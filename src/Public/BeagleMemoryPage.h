@@ -1,5 +1,25 @@
 #pragma once
 #include <Windows.h>
+#include <assert.h>
+#include "BeagleHelpers.h"
+
+#define DEFAULT_READ_REGION_LOOP(TYPE, EXECUTION) \
+HandleIsValidPtr();\
+for (int i = 0; i < (int)PageRegionSize; i += sizeof(TYPE)) \
+{ \
+	TYPE ReadedValue; \
+	MemoryChange<TYPE> Data{ \
+		ProcessOwner->GetProcessHandle(), \
+		(unsigned long)((int)PageAddress + i), \
+		&ReadedValue \
+	}; \
+	if (BeagleHelpers::ReadMemory(Data))\
+	{\
+		EXECUTION(ReadedValue);\
+	}\
+} 
+
+class BeagleProcess;
 
 class BeagleMemoryPage
 {
@@ -10,21 +30,12 @@ private:
 
 public:
 
-	BeagleMemoryPage(MEMORY_BASIC_INFORMATION _MemoryInformation);
+	BeagleMemoryPage(BeagleProcess* Process, MEMORY_BASIC_INFORMATION _MemoryInformation);
 
-	void ReadPageRegion()
-	{
-		for (int i = 0; i < (int)PageRegionSize; i += 4)
-		{
-			/*int Value;
-			SIZE_T S;
-			BOOL ReadResult = ReadProcessMemory(p,
-				(void*)((int)meminfo.BaseAddress + i),
-				&val,
-				sizeof(int),
-				&S);*/
-		}
-	}
+	void HandleIsValidPtr();
+
+	template <typename T> 
+	void ReadPageRegionByType();
 
 public:
 
@@ -32,6 +43,10 @@ public:
 	SIZE_T PageRegionSize;
 	DWORD PageState;
 	DWORD PageProtect;
+
+private:
+
+	BeagleProcess* ProcessOwner;
 
 };
 

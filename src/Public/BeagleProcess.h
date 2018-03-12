@@ -3,6 +3,10 @@
 #include <vector>
 #include "..\Public\BeagleMemoryPage.h"
 
+typedef std::vector <
+		std::shared_ptr< BeagleMemoryPage >
+		> PageMemoryArray;
+
 class BeagleProcess
 {
 
@@ -12,20 +16,29 @@ private:
 
 public:
 
-	BeagleProcess(DWORD _ProcessID);
+	BeagleProcess(DWORD _ProcessID, bool SweepOnInit = false);
 	
-	BeagleProcess(const char* ProcessName);
+	BeagleProcess(const char* ProcessName, bool SweepOnInit = false);
+
+	HANDLE GetProcessHandle();
+
+	int GetProcessID();
 
 	void Close();
 
-	std::vector<BeagleMemoryPage*> SweepProcessPages();
+	void SweepProcessPages();
 
-public:
+	void ClearSavedProcessPages();
+
+	PageMemoryArray GetSavedPages();
+
+private:
+
+	PageMemoryArray CurrentPages;
 
 	int ProcessID;
 
 	HANDLE ProcessHandle;
-
-	std::vector< std::shared_ptr< BeagleMemoryPage > > CurrentPages;
+	
 };
 
