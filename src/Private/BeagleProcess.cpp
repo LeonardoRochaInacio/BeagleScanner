@@ -5,7 +5,7 @@ BeagleProcess::BeagleProcess(DWORD _ProcessID, bool SweepOnInit)
 {
 	ProcessID = _ProcessID;
 	ProcessHandle = BeagleHelpers::CreateProcessHandle(ProcessID, BEAGLE_ARM_ALL_ACCESS);
-	if (SweepOnInit) SweepProcessPages();
+	if (SweepOnInit) SweepProcessPages(MEM_COMMIT);
 }
 
 BeagleProcess::BeagleProcess(const char * ProcessName, bool SweepOnInit)
@@ -14,7 +14,7 @@ BeagleProcess::BeagleProcess(const char * ProcessName, bool SweepOnInit)
 	BeagleHelpers::GetProcessID_ByName(ProcessName, _ProcessID);
 	ProcessID = _ProcessID;
 	ProcessHandle = BeagleHelpers::CreateProcessHandle(ProcessID, BEAGLE_ARM_ALL_ACCESS);
-	if (SweepOnInit) SweepProcessPages();
+	if (SweepOnInit) SweepProcessPages(MEM_COMMIT);
 }
 
 HANDLE BeagleProcess::GetProcessHandle()
@@ -33,6 +33,11 @@ void BeagleProcess::Close()
 }
 
 void BeagleProcess::SweepProcessPages()
+{	
+	SweepProcessPages(MEM_COMMIT | MEM_FREE | MEM_RESERVE);
+}
+
+void BeagleProcess::SweepProcessPages(unsigned long Type)
 {
 	ClearSavedProcessPages();
 
@@ -48,7 +53,7 @@ void BeagleProcess::SweepProcessPages()
 			break;
 		}
 
-		if (!bFirstLoop)
+		if (!bFirstLoop && (MemoryInfo.State & Type) && (MemoryInfo.Protect & BEAGLE_ARM_PAGE_READWRITE))
 		{
 			CurrentPages.push_back(std::shared_ptr<BeagleMemoryPage>(new BeagleMemoryPage{ this, MemoryInfo }));
 		}

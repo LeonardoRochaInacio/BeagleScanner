@@ -1,10 +1,13 @@
 #pragma once
 #include <Windows.h>
 #include <assert.h>
+#include <map>
+#include <memory>
 #include "BeagleHelpers.h"
 
-#define DEFAULT_READ_REGION_LOOP(TYPE, EXECUTION) \
+#define DEFAULT_READ_REGION_LOOP(TYPE, EXECUTION, FINALCOUNT) \
 HandleIsValidPtr();\
+unsigned long MCount = 0;\
 for (int i = 0; i < (int)PageRegionSize; i += sizeof(TYPE)) \
 { \
 	TYPE ReadedValue; \
@@ -14,15 +17,21 @@ for (int i = 0; i < (int)PageRegionSize; i += sizeof(TYPE)) \
 		&ReadedValue \
 	}; \
 	bool Success = BeagleHelpers::ReadMemory(Data);\
-	if(Success) EXECUTION(Success, ReadedValue, (unsigned long)((int)PageAddress + i));\
-} 
+	if(Success)\
+	{\
+			EXECUTION(Success, ReadedValue, MCount, (unsigned long)((int)PageAddress + i)); \
+			MCount++;\
+	}\
+}\
+FINALCOUNT = MCount;
 
-enum MemoryState
+struct ReadedPageInformation
 {
-	Commit,
-	Free,
-	Reserve
+	unsigned long PageAdress = 0x0;
+	unsigned long FoundedValues = 0;
 };
+
+typedef struct ReadedPageInformation ReadedPageInformation;
 
 class BeagleProcess;
 
@@ -41,10 +50,12 @@ public:
 
 	int GetMemoryStateCode();
 
+	unsigned long GetPageAddress();
+
 	void HandleIsValidPtr();
 
 	template <typename T> 
-	void ReadPageRegionByType();
+	std::map<unsigned long, T> ReadPageRegionByType(ReadedPageInformation & ReadInfo);
 
 private:
 

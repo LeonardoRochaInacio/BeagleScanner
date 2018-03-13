@@ -28,6 +28,8 @@ public:
 
 	void SweepProcessPages();
 
+	void SweepProcessPages(unsigned long Type);
+
 	void ClearSavedProcessPages();
 
 	PageMemoryArray GetSavedPages();

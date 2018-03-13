@@ -97,52 +97,6 @@ public:
 
 	static int GetWindowsPageSize();
 
-	/*TESTE*/
-	static void T(HANDLE p)
-	{
-		unsigned char * addr = 0x0;
-		MEMORY_BASIC_INFORMATION meminfo;
-
-		while (1)
-		{
-			if (VirtualQueryEx(p, addr, &meminfo, sizeof(meminfo)) == 0)
-			{
-				break;
-			}
-
-			
-
-			if ((meminfo.State & MEM_COMMIT) && (meminfo.Protect & BEAGLE_ARM_PAGE_READWRITE))
-			{
-				for (int i = 0; i <(int) meminfo.RegionSize; i += 4)
-				{
-					int val;
-					SIZE_T S;
-					BOOL ReadResult = ReadProcessMemory(p,
-						(void*)((int)meminfo.BaseAddress + i),
-						&val,
-						sizeof(int),
-						&S);
-					if (val == 782746)
-					{
-						int H = 1337;
-						WriteProcessMemory(p, (void*)((int)meminfo.BaseAddress + i), &H, sizeof(int), &S);
-						//std::cout << std::hex << (unsigned int)meminfo.BaseAddress + i << std::dec << " VAL: " << val << std::endl;
-					}
-					
-				}
-			}
-
-			
-			
-
-			addr = (unsigned char *)meminfo.BaseAddress + meminfo.RegionSize;
-			
-			//std::cout << std::hex << meminfo.State << std::endl;
-		}
-			
-	}
-
 	template <typename BufferType>
 	static bool ReadMemory(MemoryChange<BufferType> MemoryInfo);
 

@@ -21,35 +21,45 @@ int BeagleMemoryPage::GetMemoryStateCode()
 	return PageState;
 }
 
+unsigned long BeagleMemoryPage::GetPageAddress()
+{
+	return (unsigned long)PageAddress;
+}
+
 void BeagleMemoryPage::HandleIsValidPtr()
 {
 	assert(ProcessOwner);
 }
 
 template<>
-void BeagleMemoryPage::ReadPageRegionByType<int>()
+std::map<unsigned long, int> BeagleMemoryPage::ReadPageRegionByType<int>(ReadedPageInformation & ReadInfo)
 {
+	std::map<unsigned long, int> ReturnedData;
 	DEFAULT_READ_REGION_LOOP(int, 
-	[](bool Success, int Value, int MemoryAdress)
+	[&](bool Success, int Value, unsigned long Count, unsigned long MemoryAdress)
 	{
 		if (!Success) return;
-		//SOMENTE PARA TESTES, VERIFICAR ESTADO DA PAGINA
-		if (Value == 782746)
-		{
-			std::cout << "Data: " << std::hex << MemoryAdress << std::endl;
-		}
-			
-	});
+		ReturnedData[MemoryAdress] = Value;
+	},
+	ReadInfo.FoundedValues);
+	ReadInfo.PageAdress = GetPageAddress();
+
+	return ReturnedData;
 }
 
 template<>
-void BeagleMemoryPage::ReadPageRegionByType<float>()
+std::map<unsigned long, float> BeagleMemoryPage::ReadPageRegionByType<float>(ReadedPageInformation & ReadInfo)
 {
-	
+	std::map<unsigned long, float> ReturnedData;
 	DEFAULT_READ_REGION_LOOP(float,
-	[](bool Success, float Value, int MemoryAdress)
+	[&](bool Success, float Value, unsigned long Count, unsigned long MemoryAdress)
 	{
-		
-	});
+		if (!Success) return;
+		ReturnedData[MemoryAdress] = Value;
+	},
+	ReadInfo.FoundedValues);
+	ReadInfo.PageAdress = GetPageAddress();
+
+	return ReturnedData;
 }
 
